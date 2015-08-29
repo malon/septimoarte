@@ -75,7 +75,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
             minZoom: current_zoom_level,
             maxZoom: 16,
             attributionControl: false,
-            maxBounds: bounds
+            //maxBounds: bounds
         });
 
         map.addLayer(config.base_layer);
