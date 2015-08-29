@@ -126,13 +126,18 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
         }
 
         function set_circle_radius(d) {
-            var r = 3;
+            var r = 10;
             return r;
 
         }
 
-        function set_circle_color(d) {
-            return "#FF0000";
+        function set_circle_visibility(d) {
+            if (config.filtered_locations) {
+                if (config.filtered_locations.hasOwnProperty(d.id))                    
+                    return 1;
+                else
+                    return 0;
+            }
         }
 
         function check_available_data() {
@@ -155,8 +160,10 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                     config.sql.execute(query, data)
                     .done(function(collection) {
                         var rows = collection.rows;
-                        console.log(rows);
-                        redraw_map();
+                        config.filtered_locations = rows.map(function(r) {return r["id"];});
+                        features.transition().ease("quad-in-out").duration(1000)
+                            .style("fill-opacity", set_circle_visibility)
+                            .call(d3endall, enable_map_events);
                     });
                 }
                 permalink.set();
@@ -164,23 +171,11 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
             }
         }
 
-        function redraw_map() {
+        function redraw_map(rows) {
             disable_map_events();
             features.transition().ease("quad-in-out").duration(1000)
                 .attr("d",path.pointRadius(set_circle_radius))
                 .call(d3endall, enable_map_events);
-            // If we have a selected polling station simulate click
-            if (ctxt.selected_location) {
-                var id_establecimiento = ctxt.selected_polling;
-                config.sql.execute(templates.permalink_sql,{id_establecimiento: id_establecimiento})
-                .done(function(data) {
-                    var position = JSON.parse(data.rows[0].g).coordinates;
-                    var latlng = L.latLng(position[1], position[0]);
-                    var d = data.rows[0];
-                    map.panTo(latlng);
-                    d3featureClick({properties: d},null,latlng);
-                });
-            }
         }
 
         /** D3 LAYER EVENTS */

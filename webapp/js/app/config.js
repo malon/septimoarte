@@ -24,6 +24,7 @@ define([], function() {
     screen_width: null,
     current_latlng: null,
     current_zoomLevel: null,
+    filtered_locations: null,
     base_layer: L.tileLayer(mapboxUrl, {
                                         id: 'olcreativa.mle7fnoa',  
                                         attribution: "OpenStreetMaps", 
