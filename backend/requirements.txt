@@ -1,0 +1,13 @@
+csvkit==0.9.1
+dbf==0.94.3
+Django==1.8.4
+django-leaflet==0.16.0
+geopy==1.10.0
+jdcal==1.0
+openpyxl==2.2.0b1
+psycopg2==2.6.1
+python-dateutil==2.2
+six==1.9.0
+SQLAlchemy==1.0.8
+wheel==0.24.0
+xlrd==0.9.4
