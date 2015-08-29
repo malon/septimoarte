@@ -8,10 +8,12 @@ path:hover {
 }
 
 svg#d3layer path.location {
-  fill: #f00;
+  fill: #F77E05;
+  /*
   stroke: #fff;
-  stroke-width: 1px;
-  fill-opacity: 0.5;
+    stroke-width: 1px;
+    */
+  fill-opacity: 0.2;
 }
 
 svg#d3layer .disabled {
