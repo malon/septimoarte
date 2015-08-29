@@ -108,6 +108,7 @@ async.waterfall([
         var movies_search = 0;
         var movies_requested = 0;
         var movie_csv;
+        var movie_title;
 
         for(var i = 0; i < 100; i++) {
             movie_csv = movies_csv[i];
@@ -130,7 +131,8 @@ async.waterfall([
                                     movie.directors = $('div[itemprop="directors"] span[itemprop="name"]').text().trim();
                                     movie.duration = $('time[itemprop="duration"]').text().trim();
 
-                                    movies[movie.title] = movie;
+                                    movie_title = movie.title.toUpperCase();
+                                    movies[movie_title] = movie;
 
                                     movies_requested++;
                                     if(movies_search == movies_requested) {
@@ -143,6 +145,6 @@ async.waterfall([
     },
 ],
 function(err, results){
-    console.info("hola");
     console.info(results);
+    return;
 });
