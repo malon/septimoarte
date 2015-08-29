@@ -1,2 +1,2 @@
 SELECT *, st_asgeojson(the_geom) as g 
-FROM establecimientos_t_caba_2015;
+FROM film_locations;

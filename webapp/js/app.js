@@ -70,37 +70,27 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                     .append("svg").attr("id", "d3layer");
         var g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
+        //Get context from permalink
+        permalink.get();
+
         config.sql.execute(templates.d3_geom_sql,null,{format: 'GeoJSON'})
             .done(function(collection) {
                 // store geoJSON in context
                 geom = collection;
 
-                features = g.selectAll("path.establecimiento")
-                                .data(collection.features, function(d) {return d.properties.id_establecimiento;});
+                features = g.selectAll("path.location")
+                                .data(collection.features, function(d) {return d.properties.id;});
 
                 //Create the polling tables circles
                 features.enter()
                         .append("path")
-                        .attr("class", "establecimiento")
-                        .attr('id', function(d) {return "id"+d.properties.id_establecimiento;})
+                        .attr("class", "location")
+                        .attr('id', function(d) {return "id"+d.properties.id;})
                         .on('click', d3featureClick);
 
                 map.on("viewreset", reset);
                 reset();
 
-                //Get context from permalink
-                permalink.get();
-                if (ctxt.selected_party != "00") {
-                    d3.select("button.active").classed("active", false);
-                    var el_id = ctxt.show_diff.toString()+"_"+ctxt.selected_party;
-                    d3.select("button#"+el_id).classed("active", true);
-                    if (ctxt.show_diff) {
-                        d3.select("#refCirculos").classed("refDisabled", true);
-                        d3.select("#refFlechas").classed("refDisabled", false);
-                    }
-                } 
-                // Show drawing helper
-                d3.select("div#instructivo").classed("disabled", false);
                 //We need to check the permalink
                 update_map();
             });
@@ -121,7 +111,8 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                .style("top", topLeft[1]+ "px");
 
             g.attr("transform", "translate(" + (-topLeft[0]) + "," + (-topLeft[1]) + ")");
-            if (!(_.isEmpty(presults))) {
+            // TODO add permalink functionality
+            if (true) {
                 features.attr("d", path).style("fill", set_circle_color);
             }
         }
@@ -136,41 +127,9 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
         }
 
         function set_circle_radius(d) {
-            var r = null;
+            var r = 3;
+            return r;
 
-            //When showing differences adjust radius with zoom
-            if (ctxt.show_diff) {
-                r = config.zoom_radius[current_zoom_level];
-                return r;
-            }
-
-            var pid = null;
-            var fid = d.properties.id_establecimiento;
-            if (!ctxt.selected_party) {
-                pid = "winner";
-            }
-            else {
-                pid = ctxt.selected_party;
-            }
-            var pos = d.properties.positivos;
-            var v = presults[pid][fid].votos / pos;
-            var min = presults[pid].extent[0] / pos;
-            var max = presults[pid].extent[1] / pos;
-            // Quadratic Party extent
-            //var s = d3.scale.sqrt().domain([min,max]).range([2,12]);
-            // Linear Party extent
-            //var s = d3.scale.linear().domain([min,max]).range([2,12]);
-            // Quadratic Party max
-            //var s = d3.scale.sqrt().domain([0,max]).range([2,12]);
-            // Linear Party max
-            //var s = d3.scale.linear().domain([0,max]).range([2,12]);
-            // Quadratic Total percentage
-            //var s = d3.scale.sqrt().domain([0,1]).range([2,12]);
-            // Linear Total percentage
-            var s = d3.scale.linear().domain([0,1]).range([2,12]);
-            //console.log("v: "+v);
-            //console.log("scaled: "+s(v));
-            return s(v);
         }
 
         function set_circle_color(d) {
@@ -178,27 +137,24 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
         }
 
         function check_available_data() {
-            var p = ctxt.selected_party;
-            if (!ctxt.selected_party) {
-                ctxt.selected_party = "00";
-                p = "00";
-            }
-            if(p in presults) {
+            var p = ctxt.selected_movie;
+            if (!ctxt.selected_movie) {
+                //TODO cuando vengo con datos en permalink
                 return true;
             }
-            return false;
+            return true;
         }
 
         function update_map() {
             if (!check_available_data()) {
                 // from here http://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group
                 var query, data;
-                if (ctxt.selected_party == "00") {
-                    query = templates.d3_winner_sql;
+                if (ctxt.selected_movie) {
+                    query = templates.d3_movie_sql;
                     data = {};
                 }else {
                     query = templates.d3_diff_sql;
-                    data = {id_partido: ctxt.selected_party};
+                    data = {id_partido: ctxt.selected_movie};
                 }
                 
                 config.sql.execute(query, data)
@@ -223,13 +179,11 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
 
         function redraw_map() {
             disable_map_events();
-            features.classed("aux", ctxt.show_diff);
             features.transition().ease("quad-in-out").duration(1000)
                 .attr("d",path.pointRadius(set_circle_radius))
-                .style("fill", set_circle_color)
                 .call(d3endall, enable_map_events);
             // If we have a selected polling station simulate click
-            if (ctxt.selected_polling) {
+            if (ctxt.selected_location) {
                 var id_establecimiento = ctxt.selected_polling;
                 config.sql.execute(templates.permalink_sql,{id_establecimiento: id_establecimiento})
                 .done(function(data) {
@@ -247,25 +201,15 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
         // Get data for the clicked polling station and show popup and overlay
         function d3featureClick(d, i, latlng) {
             //Update context
-            if (ctxt.selected_polling != d.properties.id_establecimiento) {
+            if (ctxt.selected_location != d.properties.id) {
                 map.closePopup();
-                ctxt.selected_polling = d.properties.id_establecimiento;                
+                ctxt.selected_location = d.properties.id;
             }
 
             //Finally update permalink
             permalink.set();
 
-            // google analytics
-            if (i !== null) {
-                var key_GA  = "Establecimiento_"+ctxt.selected_polling;
-                _gaq.push(['_trackEvent','2015CabaMap', "click", key_GA]);
-            }
-            // Ger rid of helper texts
-            if ($('div#instructivo').is(":visible")) {
-                $('div#instructivo').fadeOut(200); 
-            }
-
-            if (ctxt.selected_party == "00") {
+            if (ctxt.selected_movie) {
                 $('#overlay *').fadeOut(200, function() { $(this).remove();});
                 showOverlay();
             }
@@ -276,10 +220,10 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
             config.current_latlng = latlng;
             map.panTo(latlng);
             setTimeout(function() {
-                var fid = d.properties.id_establecimiento;
+                var fid = d.properties.id;
                 var query;
                 var data;
-                if (ctxt.selected_party == "00") {
+                if (ctxt.selected_party) {
                     query = templates.click_feature_winner_sql;
                     data = {id_establecimiento: fid};
                 }else {
@@ -306,19 +250,10 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                          dict_datos: config.diccionario_datos,
                          vh: view_helpers};
             /** If we are viewing differences ignore overlay */
-            if (ctxt.selected_party != "00") {
-                if (ctxt.show_diff) {
-                    //Tooltip
-                    popup = L.popup().setLatLng(latlng)
-                                     .setContent(popup_arrow_tpl(ttip_data))
-                                     .openOn(map);
-                }
-                else {
-                    //Tooltip
-                    popup = L.popup().setLatLng(latlng)
-                                     .setContent(popup_tpl(ttip_data))
-                                     .openOn(map);
-                }
+            if (ctxt.selected_movie) {
+                popup = L.popup().setLatLng(latlng)
+                                 .setContent(popup_tpl(ttip_data))
+                                 .openOn(map);
                 return false;
             }
 
@@ -403,11 +338,11 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
 
         // Close popup and overlay
         map.on('popupclose', function(e) {
-            if (ctxt.selected_polling) {
-                ctxt.selected_polling = null;
+            if (ctxt.selected_location) {
+                ctxt.selected_location = null;
                 permalink.set();
             }
-            if (ctxt.selected_party == "00") {
+            if (ctxt.selected_movie) {
                 helpers.close_slide();
             }
         });
