@@ -42,10 +42,17 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 return false;
             }
         }
-        //Original
-        // var southWest = L.latLng(-34.705, -58.531),
-        //     northEast = L.latLng(-34.527, -58.335),
-        //     bounds = L.latLngBounds(southWest, northEast);
+
+        $("span#geo").click(function(){
+            getLocation(function(coords) {
+                ctxt.selected_location = true;
+                ctxt.selected_lat = coords[0];
+                ctxt.selected_lng = coords[1];
+                var latlng = L.latLng(coords[1], coords[0]);
+                map.panTo(latlng);
+                update_map();
+            });
+        });
         
         //New to allow overlay interaction
         var southWest = L.latLng(-34.738, -58.672),
@@ -129,49 +136,30 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
         }
 
         function set_circle_radius(d) {
-            var r = 10;
-            return r;
+            return 3;
 
         }
 
         function set_circle_visibility(d) {
-            if (config.filtered_locations) {
-                if (config.filtered_locations.hasOwnProperty(d.id))                    
-                    return 1;
-                else
-                    return 0;
-            }
-        }
-
-        function check_available_data() {
-            var p = ctxt.selected_movie;
-            if (!ctxt.selected_movie) {
-                //TODO cuando vengo con datos en permalink
-                return true;
-            }
-            return true;
+            if (config.filtered_locations.hasOwnProperty(d.properties.id))
+                return 1;
+            else
+                return 0;
         }
 
         function update_map() {
-            if (ctxt.selected_movie) {
-                //TODO
-            } 
-            else {
-                if (ctxt.selected_location) {
-                    var query = templates.d3_near_sql;
-                    var data = {lat: ctxt.selected_lat, lng: ctxt.selected_lng};
-                    config.sql.execute(query, data)
-                    .done(function(collection) {
-                        var rows = collection.rows;
-                        config.filtered_locations = rows.map(function(r) {return r["id"];});
-                        features.transition().ease("quad-in-out").duration(1000)
-                            .style("fill-opacity", set_circle_visibility)
-                            .call(d3endall, enable_map_events);
-                    });
-                }
-                permalink.set();
-                redraw_map();
+            if (ctxt.selected_location) {
+                var query = templates.d3_near_sql;
+                var data = {lat: ctxt.selected_lat, lng: ctxt.selected_lng};
+                config.sql.execute(query, data)
+                .done(function(collection) {
+                    var rows = collection.rows;
+                    config.filtered_locations = rows.map(function(r) {return r["id"];});
+                    features.style("fill-opacity", set_circle_visibility);
+                });
             }
+            permalink.set();
+            redraw_map();
         }
 
         function redraw_map(rows) {
@@ -181,7 +169,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 .call(d3endall, enable_map_events);
         }
 
-        function getLocation() {
+        function getLocation(cb) {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition);
             } else { 
@@ -189,8 +177,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
             }
 
             function showPosition(position) {
-                console.log(position)
-                return [position.coords.latitude, position.coords.longitude];
+                cb([position.coords.latitude, position.coords.longitude]);
             }
         }
 
