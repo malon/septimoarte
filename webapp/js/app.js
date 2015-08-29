@@ -53,6 +53,16 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 update_map();
             });
         });
+
+        $("span#logo").click(function(){
+                ctxt.selected_location = false;
+                ctxt.selected_lat = null;
+                ctxt.selected_lng = null;
+                config.filtered_locations = null;
+                var latlng = L.latLng(config.bsas_center[1], config.bsas_center[0]);
+                map.panTo(latlng);
+                update_map();
+        });
         
         //New to allow overlay interaction
         var southWest = L.latLng(-34.738, -58.672),
@@ -161,6 +171,9 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                     console.log(config.filtered_locations);
                     features.style("fill-opacity", set_circle_visibility);
                 });
+            }
+            else {
+                features.style("fill-opacity", 0.2);
             }
             permalink.set();
             redraw_map();
