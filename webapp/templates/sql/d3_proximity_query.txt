@@ -1,4 +1,4 @@
 SELECT id
 FROM film_locations 
 ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint({{lng}},{{lat}}),4326) ASC 
-LIMIT 10
+LIMIT 100
