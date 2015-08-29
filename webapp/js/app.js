@@ -158,6 +158,16 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
             return v; 
         }
 
+        function set_circle_display(d) {
+            var v = "none";
+            config.filtered_locations.forEach(function(i) {
+                if (i == d.properties.id) {
+                    v = "block";
+                }
+            });
+            return v; 
+        }
+
         function update_map() {
             if (ctxt.selected_location) {
                 var query = templates.d3_near_sql;
@@ -167,11 +177,12 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                     var rows = collection.rows;
                     config.filtered_locations = rows.map(function(r) {return r["id"];});
                     console.log(config.filtered_locations);
-                    features.style("fill-opacity", set_circle_visibility);
+                    features.style("fill-opacity", set_circle_visibility)
+                    .style("display", set_circle_display);
                 });
             }
             else {
-                features.style("fill-opacity", 0.2);
+                features.style("fill-opacity", 0.2).style("display", "block");
             }
             permalink.set();
             redraw_map();
