@@ -47,10 +47,39 @@ h1 span {
 
 
 .tooltipd3{ /* tooltip d3*/
-
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:14px;
+	line-height:20px;
 	background: #fff;
 	padding: 10px
-
 }
 
-.tooltipd3 .close { display: inline-block; position: absolute; top: 0; right: 0; color: #ccc; font-weight: bold; padding: 5px;}
+
+.tooltipd3 .close {
+	
+	display: inline-block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	color: #ccc;
+	font-weight: bold;
+	padding: 5px;
+	float:right;
+}
+
+.tooltipd3 .title {
+	background:#FCD095;
+	padding-bottom:5px;
+	font-weight:bold;
+	padding-bottom:5px;
+	padding-left:5px;
+	padding-top:3px;
+	margin-bottom:5px;
+	/*border-bottom: 1px #ccc solid;*/
+}
+
+.tooltipd3 .productora, .date {
+	font-size:12px;
+	color:grey;
+	
+}
