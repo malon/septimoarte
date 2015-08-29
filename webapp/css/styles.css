@@ -44,3 +44,13 @@ h1 span {
 #destacadas {
 	
 }
+
+
+.tooltipd3{ /* tooltip d3*/
+
+	background: #fff;
+	padding: 10px
+
+}
+
+.tooltipd3 .close { display: inline-block; position: absolute; top: 0; right: 0; color: #ccc; font-weight: bold; padding: 5px;}
