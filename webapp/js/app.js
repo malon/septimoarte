@@ -70,9 +70,6 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                     .append("svg").attr("id", "d3layer");
         var g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-        //Get context from permalink
-        permalink.get();
-
         config.sql.execute(templates.d3_geom_sql,null,{format: 'GeoJSON'})
             .done(function(collection) {
                 // store geoJSON in context
@@ -91,6 +88,8 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                 map.on("viewreset", reset);
                 reset();
 
+                //Get context from permalink
+                permalink.get();
                 //We need to check the permalink
                 update_map();
             });
@@ -113,7 +112,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
             g.attr("transform", "translate(" + (-topLeft[0]) + "," + (-topLeft[1]) + ")");
             // TODO add permalink functionality
             if (true) {
-                features.attr("d", path).style("fill", set_circle_color);
+                features.attr("d", path);
             }
         }
 
@@ -146,17 +145,11 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
         }
 
         function update_map() {
-            if (!check_available_data()) {
+            if (ctxt.selected_movie) {
                 // from here http://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group
                 var query, data;
-                if (ctxt.selected_movie) {
-                    query = templates.d3_movie_sql;
-                    data = {};
-                }else {
-                    query = templates.d3_diff_sql;
-                    data = {id_partido: ctxt.selected_movie};
-                }
-                
+                query = templates.d3_movie_sql;
+                data = {};
                 config.sql.execute(query, data)
                 .done(function(collection) {
                     var rows = collection.rows;
@@ -172,6 +165,11 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                     redraw_map();
                 });
             } else {
+                if (ctxt.selected_location) {
+                    var query = templates.d3_near_sql;
+                    var data = {lat: ctxt.selected_lat, lng: ctxt.selected_lng};
+                    config.sql.execute(query, data)
+                }
                 permalink.set();
                 redraw_map();
             }        

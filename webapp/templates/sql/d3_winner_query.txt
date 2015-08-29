@@ -1,4 +1,0 @@
-SELECT DISTINCT ON (id_establecimiento)
-    id_establecimiento, id_partido, votos, diferencia
-FROM   diff_votos_caba_2015
-ORDER  BY id_establecimiento, votos DESC;

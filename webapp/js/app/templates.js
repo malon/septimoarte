@@ -11,14 +11,11 @@ define(['text!templates/credits.html',
     'text!templates/sql/draw_winner_selection2.txt',
     'text!templates/sql/draw_selection2.txt',
     'text!templates/sql/d3_geom.txt',
-    'text!templates/sql/d3_winner_query.txt',
-    'text!templates/sql/d3_diff_query.txt'], 
-    function(credits, overlay, popup, popup_arrow, popup_simple, metodologia, 
+    'text!templates/sql/d3_proximity_query.txt'], 
+    function(overlay, popup, popup_arrow, popup_simple, metodologia, 
              click_feature_sql, click_feature_winner_sql, permalink_sql, 
-             draw1_sql, draw2_winner_sql, draw2_sql, d3_geom_sql, d3_winner_sql, 
-             d3_diff_sql) {
+             draw1_sql, draw2_winner_sql, draw2_sql, d3_geom_sql, d3_near_sql) {
         return {
-            credits: credits,
             overlay: overlay,
             popup: popup,
             popup_arrow: popup_arrow,
@@ -31,7 +28,6 @@ define(['text!templates/credits.html',
             draw2_winner_sql: draw2_winner_sql,
             draw2_sql: draw2_sql,
             d3_geom_sql: d3_geom_sql,
-            d3_winner_sql: d3_winner_sql,
-            d3_diff_sql: d3_diff_sql
+            d3_near_sql: d3_near_sql
         };
 });
