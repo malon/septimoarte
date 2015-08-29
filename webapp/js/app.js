@@ -141,10 +141,13 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
         }
 
         function set_circle_visibility(d) {
-            if (config.filtered_locations.hasOwnProperty(d.properties.id))
-                return 1;
-            else
-                return 0;
+            var v = 0;
+            config.filtered_locations.forEach(function(i) {
+                if (i == d.properties.id) {
+                    v = 1;
+                }
+            });
+            return v; 
         }
 
         function update_map() {
@@ -155,6 +158,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 .done(function(collection) {
                     var rows = collection.rows;
                     config.filtered_locations = rows.map(function(r) {return r["id"];});
+                    console.log(config.filtered_locations);
                     features.style("fill-opacity", set_circle_visibility);
                 });
             }
