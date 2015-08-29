@@ -9,8 +9,8 @@ define(['text!templates/overlay.html',
     'text!templates/sql/d3_geom.txt',
     'text!templates/sql/d3_proximity_query.txt'], 
     function(overlay, popup, popup_arrow, popup_simple, metodologia, tooltip,
-             click_feature_sql, click_feature_winner_sql, permalink_sql, 
-             draw1_sql, draw2_winner_sql, draw2_sql, d3_geom_sql, d3_near_sql) {
+             click_feature_sql, permalink_sql, 
+             d3_geom_sql, d3_near_sql) {
         return {
             overlay: overlay,
             popup: popup,
