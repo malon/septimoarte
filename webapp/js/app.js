@@ -80,6 +80,10 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
 
         map.addLayer(config.base_layer);
 
+        new L.Control.GeoSearch({
+            provider: new L.GeoSearch.Provider.OpenStreetMap()
+        }).addTo(map);
+
         config.sql = new cartodb.SQL({
             user: config.CARTODB_USER
         });
