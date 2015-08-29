@@ -1,5 +1,4 @@
-define(['text!templates/credits.html',
-    'text!templates/overlay.html',
+define(['text!templates/overlay.html',
     'text!templates/popup.html',
     'text!templates/popup_arrow.html',
     'text!templates/popup_simple.html',

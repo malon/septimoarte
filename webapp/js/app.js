@@ -146,33 +146,22 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
 
         function update_map() {
             if (ctxt.selected_movie) {
-                // from here http://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group
-                var query, data;
-                query = templates.d3_movie_sql;
-                data = {};
-                config.sql.execute(query, data)
-                .done(function(collection) {
-                    var rows = collection.rows;
-                    presults[ctxt.selected_party] = d3.nest()
-                                                 .key(function(d) {return d.id_establecimiento;})
-                                                 .rollup(function(data) { return data[0]; })
-                                                 .map(rows);
-
-                    // Get the extent of the data and store it for later use
-                    presults[ctxt.selected_party].extent = d3.extent(rows, function(r) {return r.votos;});
-                    presults[ctxt.selected_party].max_diff = d3.max(rows, function(r) {return Math.abs(r.diferencia);});
-                    permalink.set();
-                    redraw_map();
-                });
-            } else {
+                //TODO
+            } 
+            else {
                 if (ctxt.selected_location) {
                     var query = templates.d3_near_sql;
                     var data = {lat: ctxt.selected_lat, lng: ctxt.selected_lng};
                     config.sql.execute(query, data)
+                    .done(function(collection) {
+                        var rows = collection.rows;
+                        console.log(rows);
+                        redraw_map();
+                    });
                 }
                 permalink.set();
                 redraw_map();
-            }        
+            }
         }
 
         function redraw_map() {
