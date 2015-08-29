@@ -48,7 +48,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 ctxt.selected_location = true;
                 ctxt.selected_lat = coords[0];
                 ctxt.selected_lng = coords[1];
-                var latlng = L.latLng(coords[1], coords[0]);
+                var latlng = L.latLng(coords[0], coords[1]);
                 map.panTo(latlng);
                 update_map();
             });
@@ -59,7 +59,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 ctxt.selected_lat = null;
                 ctxt.selected_lng = null;
                 config.filtered_locations = null;
-                var latlng = L.latLng(config.bsas_center[1], config.bsas_center[0]);
+                var latlng = L.latLng(config.bsas_center[0], config.bsas_center[1]);
                 map.panTo(latlng);
                 update_map();
         });
