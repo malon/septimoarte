@@ -4,18 +4,20 @@ requirejs.config({
         'templates': '../templates', 
         'text': '../libs/requirejs-text/text',
         'd3': '../libs/d3/d3.min',
+        'tooltipd3': '../libs/tooltip.d3'
+
     }
 });
 
 requirejs(['app/config', 'app/context', 'app/templates', 
            'app/helpers', 'app/view_helpers', 'app/permalink', 
-           'd3'],
-function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
+           'd3', 'tooltipd3'],
+function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltipd3) {
     $(function() {
     "use strict";
         var map;
         // Template for percentage tooltip
-        var popup_tpl = _.template(templates.popup);
+        var tooltip_tmpl = _.template(templates.tooltip);
         var transform = d3.geo.transform({point: projectPoint});
         var path = d3.geo.path().projection(transform).pointRadius(0);
         var presults = {};
@@ -86,7 +88,8 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                         .append("path")
                         .attr("class", "location")
                         .attr('id', function(d) {return "id"+d.properties.id;})
-                        .on('click', d3featureClick);
+                        .on('click', d3featureClick)
+                        .on("mouseover", d3featureOver);
 
                 map.on("viewreset", reset);
                 reset();
@@ -94,7 +97,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
                 //We need to check the permalink
                 update_map();
             });
-
+        
         // Reposition the SVG to cover the features.
         function reset() {
             current_zoom_level = map.getZoom();
@@ -181,7 +184,8 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
             disable_map_events();
             features.transition().ease("quad-in-out").duration(1000)
                 .attr("d",path.pointRadius(set_circle_radius))
-                .call(d3endall, enable_map_events);
+                .call(d3endall, enable_map_events)
+                ;
             // If we have a selected polling station simulate click
             if (ctxt.selected_location) {
                 var id_establecimiento = ctxt.selected_polling;
@@ -196,49 +200,33 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3) {
             }
         }
 
-        /** D3 LAYER EVENTS */
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else { 
+                return "Geolocation is not supported by this browser.";
+            }
 
+            function showPosition(position) {
+                console.log(position)
+                return [position.coords.latitude, position.coords.longitude];
+            }
+        }
+
+        /** D3 LAYER EVENTS */
+        var tooltip = tooltipd3();
         // Get data for the clicked polling station and show popup and overlay
         function d3featureClick(d, i, latlng) {
-            //Update context
-            if (ctxt.selected_location != d.properties.id) {
-                map.closePopup();
-                ctxt.selected_location = d.properties.id;
-            }
+            console.log(d);
+            var html = ""
+            d.properties.title;
+            tooltip.mouseover(tooltip_tmpl(d.properties)); // pass html content
+            tooltip.mousemove(d);
+        }
+        
+        // Get data for the over polling station 
+        function d3featureOver(d, i){
 
-            //Finally update permalink
-            permalink.set();
-
-            if (ctxt.selected_movie) {
-                $('#overlay *').fadeOut(200, function() { $(this).remove();});
-                showOverlay();
-            }
-
-            if (!latlng) {
-                latlng = L.latLng(d.geometry.coordinates[1], d.geometry.coordinates[0]);
-            }
-            config.current_latlng = latlng;
-            map.panTo(latlng);
-            setTimeout(function() {
-                var fid = d.properties.id;
-                var query;
-                var data;
-                if (ctxt.selected_party) {
-                    query = templates.click_feature_winner_sql;
-                    data = {id_establecimiento: fid};
-                }else {
-                    query = templates.click_feature_sql;
-                    data = {id_establecimiento: fid,
-                            id_partido: ctxt.selected_party};
-                }
-                config.sql.execute(query, data)
-                    .done(_.partial(featureClickDone, latlng, d.properties))
-                    .error(function(errors) {
-                        // errors contains a list of errors
-                        console.log(errors);
-                    });
-            }, 200);
-            return false;
         }
 
         //Called when the Cartodb SQL has finished

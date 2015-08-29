@@ -12,11 +12,13 @@ define(['text!templates/credits.html',
     'text!templates/sql/draw_selection2.txt',
     'text!templates/sql/d3_geom.txt',
     'text!templates/sql/d3_winner_query.txt',
-    'text!templates/sql/d3_diff_query.txt'], 
+    'text!templates/sql/d3_diff_query.txt',
+    'text!templates/tooltip.html'
+    ], 
     function(credits, overlay, popup, popup_arrow, popup_simple, metodologia, 
              click_feature_sql, click_feature_winner_sql, permalink_sql, 
              draw1_sql, draw2_winner_sql, draw2_sql, d3_geom_sql, d3_winner_sql, 
-             d3_diff_sql) {
+             d3_diff_sql, tooltip) {
         return {
             credits: credits,
             overlay: overlay,
@@ -32,6 +34,7 @@ define(['text!templates/credits.html',
             draw2_sql: draw2_sql,
             d3_geom_sql: d3_geom_sql,
             d3_winner_sql: d3_winner_sql,
-            d3_diff_sql: d3_diff_sql
+            d3_diff_sql: d3_diff_sql,
+            tooltip: tooltip
         };
 });
