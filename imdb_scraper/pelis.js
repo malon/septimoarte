@@ -2,6 +2,7 @@ var request = require('request');
 var cheerio = require('cheerio');
 var events = require('events');
 var async = require('async');
+var fs = require('fs');
 
 const imdb_search_url = 'http://www.imdb.com/find?ref_=nv_sr_fn&exact=true&q=%title%&s=tt';
 const imdb_movie = 'http://www.imdb.com/title/';
@@ -135,6 +136,7 @@ async.waterfall([
                                     movies[movie_title] = movie;
 
                                     movies_requested++;
+                                    console.info(movie);
                                     if(movies_search == movies_requested) {
                                         cb(null, movies);
                                     }
@@ -145,6 +147,14 @@ async.waterfall([
     },
 ],
 function(err, results){
-    console.info(results);
+    fs.writeFile("imdb.json", JSON.stringify(results), function(err) {
+        if(err) {
+            return console.log(err);
+        }
+
+        console.log("The file was saved!");
+        process.exit(0);
+    });
+
     return;
 });
