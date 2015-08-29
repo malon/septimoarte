@@ -2,7 +2,7 @@
 
 var conf = {
         app_cwd:'../webapp/',
-	    opt_requerejs:'../webapp/opt-requerejs',
+	    opt_requirejs:'../webapp/opt-requirejs',
 	    dest:'../build/',
 	    commit: Math.floor(Date.now() / 1000)
 	};

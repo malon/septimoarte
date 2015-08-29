@@ -14,7 +14,7 @@ var conf = require('../conf').conf;
 var js_all = require('../conf').js_all; 
 var js_vendor = require('../conf').js_vendor; 
 
-/** requere optimizer */
+/** require optimizer */
 gulp.task('roptimize', ['test_js'], function() {
     rjs({
         mainConfigFile : conf.app_cwd+"js/init.js",
@@ -24,7 +24,7 @@ gulp.task('roptimize', ['test_js'], function() {
         removeCombined: false,
         out: js_all,
     })
-    .pipe(gulp.dest(conf.opt_requerejs))
+    .pipe(gulp.dest(conf.opt_requirejs))
     .pipe(sourcemaps.init())
     .pipe(uglify())
     .pipe(sourcemaps.write('./'))

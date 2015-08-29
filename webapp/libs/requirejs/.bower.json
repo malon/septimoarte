@@ -1,0 +1,14 @@
+{
+  "name": "requirejs",
+  "homepage": "https://github.com/jrburke/requirejs",
+  "version": "2.1.19",
+  "_release": "2.1.19",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.1.19",
+    "commit": "868e47b78aac342cfeba67f2300abe22f03fc6b4"
+  },
+  "_source": "git://github.com/jrburke/requirejs.git",
+  "_target": "~2.1.18",
+  "_originalSource": "jrburke/requirejs"
+}
