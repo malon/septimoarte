@@ -46,10 +46,20 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 ctxt.selected_location = true;
                 ctxt.selected_lat = coords[0];
                 ctxt.selected_lng = coords[1];
-                var latlng = L.latLng(coords[1], coords[0]);
+                var latlng = L.latLng(coords[0], coords[1]);
                 map.panTo(latlng);
                 update_map();
             });
+        });
+
+        $("span#logo").click(function(){
+                ctxt.selected_location = false;
+                ctxt.selected_lat = null;
+                ctxt.selected_lng = null;
+                config.filtered_locations = null;
+                var latlng = L.latLng(config.bsas_center[0], config.bsas_center[1]);
+                map.panTo(latlng);
+                update_map();
         });
         
         //New to allow overlay interaction
@@ -63,7 +73,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
             minZoom: current_zoom_level,
             maxZoom: 16,
             attributionControl: false,
-            maxBounds: bounds
+            //maxBounds: bounds
         });
 
         map.addLayer(config.base_layer);
@@ -159,6 +169,9 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                     console.log(config.filtered_locations);
                     features.style("fill-opacity", set_circle_visibility);
                 });
+            }
+            else {
+                features.style("fill-opacity", 0.2);
             }
             permalink.set();
             redraw_map();

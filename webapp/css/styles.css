@@ -22,6 +22,7 @@ h1 span {
 	display:inline-block;
 	background: url("../img/noun_10810.svg") 0px 0px no-repeat;
 	float:left;
+	cursor:pointer;
 }
 
 #geo{
