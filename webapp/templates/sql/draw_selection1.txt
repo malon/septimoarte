@@ -1,0 +1,3 @@
+SELECT e.id_establecimiento, e.positivos, e.electores, e.votantes 
+FROM establecimientos_t_caba_2015 e 
+WHERE ST_Intersects(the_geom, ST_MakePolygon(ST_MakeLine(Array[{{bounds}}])))
