@@ -72,9 +72,6 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                     .append("svg").attr("id", "d3layer");
         var g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-        //Get context from permalink
-        permalink.get();
-
         config.sql.execute(templates.d3_geom_sql,null,{format: 'GeoJSON'})
             .done(function(collection) {
                 // store geoJSON in context
@@ -94,6 +91,8 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 map.on("viewreset", reset);
                 reset();
 
+                //Get context from permalink
+                permalink.get();
                 //We need to check the permalink
                 update_map();
             });
@@ -116,7 +115,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
             g.attr("transform", "translate(" + (-topLeft[0]) + "," + (-topLeft[1]) + ")");
             // TODO add permalink functionality
             if (true) {
-                features.attr("d", path).style("fill", set_circle_color);
+                features.attr("d", path);
             }
         }
 
@@ -149,35 +148,23 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
         }
 
         function update_map() {
-            if (!check_available_data()) {
-                // from here http://stackoverflow.com/questions/3800551/select-first-row-in-each-group-by-group
-                var query, data;
-                if (ctxt.selected_movie) {
-                    query = templates.d3_movie_sql;
-                    data = {};
-                }else {
-                    query = templates.d3_diff_sql;
-                    data = {id_partido: ctxt.selected_movie};
+            if (ctxt.selected_movie) {
+                //TODO
+            } 
+            else {
+                if (ctxt.selected_location) {
+                    var query = templates.d3_near_sql;
+                    var data = {lat: ctxt.selected_lat, lng: ctxt.selected_lng};
+                    config.sql.execute(query, data)
+                    .done(function(collection) {
+                        var rows = collection.rows;
+                        console.log(rows);
+                        redraw_map();
+                    });
                 }
-                
-                config.sql.execute(query, data)
-                .done(function(collection) {
-                    var rows = collection.rows;
-                    presults[ctxt.selected_party] = d3.nest()
-                                                 .key(function(d) {return d.id_establecimiento;})
-                                                 .rollup(function(data) { return data[0]; })
-                                                 .map(rows);
-
-                    // Get the extent of the data and store it for later use
-                    presults[ctxt.selected_party].extent = d3.extent(rows, function(r) {return r.votos;});
-                    presults[ctxt.selected_party].max_diff = d3.max(rows, function(r) {return Math.abs(r.diferencia);});
-                    permalink.set();
-                    redraw_map();
-                });
-            } else {
                 permalink.set();
                 redraw_map();
-            }        
+            }
         }
 
         function redraw_map() {
