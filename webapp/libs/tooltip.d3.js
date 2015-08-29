@@ -23,6 +23,8 @@ function tooltipd3(tltp_name){
 		  	.transition()
 			.duration(300)
 			.style("opacity", 1);
+
+		s.t.selectAll(".close").on('click', function(){ s.mouseout(); });
 		
 		/** After innerhtml on tooltip get w & h */
 		s.get_t_size();
