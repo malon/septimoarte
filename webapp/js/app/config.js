@@ -1,8 +1,5 @@
 define([], function() {
-
-    var cdn_proxy = "http://olcreativa.lanacion.com.ar/dev/get_url/img.php?img=";
-    var mapboxUrl = cdn_proxy+'https://{s}.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={token}';
-    //var mapboxUrl = 'https://{s}.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={token}';
+    var mapboxUrl = 'https://{s}.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={token}';
 
     return {
     zoom_arrow_multipliers: {
@@ -22,10 +19,9 @@ define([], function() {
         16: 5
     },
     bsas_center: [-34.61597432902992, -58.442115783691406],
-    CARTODB_USER: 'lndata',
+    CARTODB_USER: 'cieslog',
     sql: null,
     screen_width: null,
-    diccionario_datos: null,
     current_latlng: null,
     current_zoomLevel: null,
     base_layer: L.tileLayer(mapboxUrl, {
