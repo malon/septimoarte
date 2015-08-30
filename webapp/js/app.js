@@ -29,10 +29,10 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
         // Set initial zoom level for responsiveness
         config.screen_width = $("body").width();
         if (is_small_screen()) {
-            current_zoom_level = 11;
+            config.initial_zoom = 11;
         }
         else {
-            current_zoom_level = 12;
+            config.initial_zoom = 12;
         }
 
         function is_small_screen() {
@@ -44,14 +44,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
         }
 
         $("span#geo").click(function(){
-            getLocation(function(coords) {
-                ctxt.selected_location = true;
-                ctxt.selected_lat = coords[0];
-                ctxt.selected_lng = coords[1];
-                var latlng = L.latLng(coords[0], coords[1]);
-                map.panTo(latlng);
-                update_map();
-            });
+            getLocation(getNearbyLocations);
         });
 
         $("span#logo").click(function(){
@@ -59,8 +52,6 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
                 ctxt.selected_lat = null;
                 ctxt.selected_lng = null;
                 config.filtered_locations = null;
-                var latlng = L.latLng(config.bsas_center[0], config.bsas_center[1]);
-                map.panTo(latlng);
                 update_map();
         });
         
@@ -71,7 +62,7 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
         
         map = L.map('mapa', {
             center: config.bsas_center,
-            zoom: current_zoom_level,
+            zoom: config.initial_zoom,
             minZoom: current_zoom_level,
             maxZoom: 16,
             attributionControl: false,
@@ -80,9 +71,12 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
 
         map.addLayer(config.base_layer);
 
+        //Add the geosearch plugin
         new L.Control.GeoSearch({
             provider: new L.GeoSearch.Provider.OpenStreetMap()
         }).addTo(map);
+        //Bind to geosearch events
+        map.on('geosearch_foundlocations', processLocation);
 
         config.sql = new cartodb.SQL({
             user: config.CARTODB_USER
@@ -176,18 +170,19 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
 
         function update_map() {
             if (ctxt.selected_location) {
+                zoom_to_location();
                 var query = templates.d3_near_sql;
                 var data = {lat: ctxt.selected_lat, lng: ctxt.selected_lng};
                 config.sql.execute(query, data)
                 .done(function(collection) {
                     var rows = collection.rows;
                     config.filtered_locations = rows.map(function(r) {return r["id"];});
-                    console.log(config.filtered_locations);
                     features.style("fill-opacity", set_circle_visibility)
                     .style("display", set_circle_display);
                 });
             }
             else {
+                zoom_to_location([config.bsas_center[0], config.bsas_center[1]]);
                 features.style("fill-opacity", 0.2).style("display", "block");
             }
             permalink.set();
@@ -211,6 +206,32 @@ function(config, ctxt, templates, helpers, view_helpers, permalink, d3, _tooltip
             function showPosition(position) {
                 cb([position.coords.latitude, position.coords.longitude]);
             }
+        }
+
+        function processLocation(results) {
+            if (results.length > 1) {
+                console.log("More than one matching result found")
+            }
+            var coords = [results.Locations[0].Y, results.Locations[0].X]
+            console.log(coords);
+            getNearbyLocations(coords);
+        }
+
+        function getNearbyLocations(coords) {
+            if (coords) {
+                ctxt.selected_location = true;
+                ctxt.selected_lat = coords[0];
+                ctxt.selected_lng = coords[1];
+                update_map();
+            }
+        }
+
+        function zoom_to_location(loc) {
+            if (!loc) 
+                map.setView([ctxt.selected_lat, ctxt.selected_lng], 18, false);
+            else 
+                map.setView(loc, config.initial_zoom, false);
+            
         }
 
         /** D3 LAYER EVENTS */

@@ -23,7 +23,7 @@ define([], function() {
     sql: null,
     screen_width: null,
     current_latlng: null,
-    current_zoomLevel: null,
+    initial_zoom: null,
     filtered_locations: null,
     base_layer: L.tileLayer(mapboxUrl, {
                                         id: 'olcreativa.mle7fnoa',  

@@ -1,4 +1,3 @@
 SELECT id
 FROM film_locations 
-ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint({{lng}},{{lat}}),4326) ASC 
-LIMIT 100
+WHERE ST_DWithin(the_geom::geography, CDB_LatLng({{lat}}, {{lng}})::geography, 500)
